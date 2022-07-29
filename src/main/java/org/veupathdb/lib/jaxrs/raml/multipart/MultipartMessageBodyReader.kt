@@ -2,12 +2,10 @@ package org.veupathdb.lib.jaxrs.raml.multipart
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.ws.rs.BadRequestException
-import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.MultivaluedMap
 import jakarta.ws.rs.ext.MessageBodyReader
 import org.apache.commons.fileupload.MultipartStream
-import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.*
 import java.io.File
 import java.io.InputStream
@@ -31,10 +29,7 @@ private const val BufferSize = 8192
 
 
 
-class MultipartMessageBodyReader(
-  @Context
-  private val request: ContainerRequest
-) : MessageBodyReader<Any> {
+class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
   /**
    * Tests whether this `MessageBodyReader` should kick in for the given

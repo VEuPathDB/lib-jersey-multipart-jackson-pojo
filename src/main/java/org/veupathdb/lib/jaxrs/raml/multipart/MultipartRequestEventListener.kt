@@ -39,6 +39,9 @@ class MultipartRequestEventListener : RequestEventListener {
    * @param event Request event.
    */
   override fun onEvent(event: RequestEvent) {
+    if (event.type == RequestEvent.Type.START)
+
+
     // Ignore all events but "FINISHED".
     if (event.type != RequestEvent.Type.FINISHED)
       return
