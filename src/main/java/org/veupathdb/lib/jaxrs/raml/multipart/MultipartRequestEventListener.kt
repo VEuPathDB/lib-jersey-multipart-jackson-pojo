@@ -5,7 +5,6 @@ import org.glassfish.jersey.server.monitoring.RequestEventListener
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.createTempDirectory
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.deleteTempDirectory
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.isMultipart
-import java.io.File
 
 /**
  * Multipart Request Event Listener
@@ -24,7 +23,14 @@ import java.io.File
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-class MultipartRequestEventListener : RequestEventListener {
+class MultipartRequestEventListener(event: RequestEvent) : RequestEventListener {
+
+  // We do this on init because the `START` request event is never actually
+  // passed to the `onEvent` method, the creation of the event listener _is_ the
+  // `START` event notification.
+  init {
+    onRequestStart(event)
+  }
 
   /**
    * Method called on request event.
@@ -49,12 +55,14 @@ class MultipartRequestEventListener : RequestEventListener {
   }
 
   private fun onRequestStart(event: RequestEvent) {
-    if (event.containerRequest.isMultipart())
+    println("onRequestStart")
+    if (event.isMultipart())
       event.containerRequest.headers.add(TempDirHeader, event.containerRequest.createTempDirectory().path)
   }
 
   private fun onRequestEnd(event: RequestEvent) {
-    if (event.containerRequest.isMultipart())
+    println("onRequestEnd")
+    if (event.isMultipart())
       event.containerRequest.deleteTempDirectory()
   }
 }

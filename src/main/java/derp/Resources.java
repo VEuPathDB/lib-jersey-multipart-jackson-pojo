@@ -1,7 +1,7 @@
 package derp;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.veupathdb.lib.jaxrs.raml.multipart.MultipartApplicationEventListener;
 import org.veupathdb.lib.jaxrs.raml.multipart.MultipartMessageBodyReader;
 
 public class Resources extends ResourceConfig {
@@ -10,7 +10,7 @@ public class Resources extends ResourceConfig {
     property("jersey.config.server.tracing.threshold", "VERBOSE");
 
     registerClasses(
-      MultiPartFeature.class,
+      MultipartApplicationEventListener.class,
 
       ErrorMapper.class,
 

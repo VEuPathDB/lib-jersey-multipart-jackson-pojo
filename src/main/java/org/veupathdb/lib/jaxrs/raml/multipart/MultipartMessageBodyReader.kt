@@ -11,7 +11,6 @@ import org.veupathdb.lib.jaxrs.raml.multipart.utils.*
 import java.io.File
 import java.io.InputStream
 import java.lang.reflect.Type
-import java.util.UUID
 
 private const val DefaultFileName = "upload"
 
@@ -21,17 +20,14 @@ private const val BufferSize = 8192
 //
 //   TODOS!!
 //
-// TODO: Tests:
-//       - Confirm that file uploads are decoded from base64 by the apache class
-//         or implement/use a streaming base64 decode to get the raw value on
-//         pipe to output stream.
-//       - Test file upload to non-file POJO property
 // TODO: Jersey's default file input handler kicks in and takes priority over
 //       this type, resulting in a file input that contains the entirety of the
 //       request body which is incorrect.
 //       Need to find a way to disable or override that behavior to use this
 //       message body reader instead.
 // TODO: does the apache stream decode the base64 wrapping the raw file content?
+// TODO: Size cap on non-file segments.  Someone could upload a 5 gig file as an
+//       int value.
 
 
 
@@ -128,25 +124,29 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
    * segment of the input body.
    */
   private fun enumReadFrom(type: Class<Any>, stream: MultipartStream): Any {
+    val constructor = type.getJacksonConstructor()
+      ?: throw InternalServerErrorException("Cannot construct instance of $type from multipart/form-data input.")
+
+
+
     TODO("damn.  we need to find the @JsonCreator static method on the enum" +
       " class, figure out what type of input it takes, then try and convert" +
       " the raw text we were given into the expected type.")
   }
 
   private fun pojoReadFrom(type: Class<Any>, stream: MultipartStream, tmpDir: File): Any {
-    // If the method takes something other than a file, then assume it's a pojo
-    // and attempt to deserialize into a map that will be converted into that
-    // pojo type.
-    //
     // NOTE: We don't try and deserialize into the pojo itself because it may be
     // an interface, an enum, or a pojo with zero no-arg constructors.
-
-
     val temp = HashMap<String, Any>()
 
+    // Skip over the initial header info that is not needed for our parsing.\
+    //
+    // If this method returns false, then there is nothing in the body, so we
+    // can attempt to convert our empty map to the pojo now and bail.
     if (!stream.skipPreamble())
       return mapper.convertValue(temp, type)
 
+    // Get a map of the fields on the POJO and their types.
     val fields = type.fieldsMap()
 
     do {
@@ -200,36 +200,12 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     return mapper.convertValue(temp, type)
   }
 
-
-  /**
-   * Creates a new temporary directory for this request, appends it to the
-   * request as a property, then returns it.
-   *
-   * The created temp directory is expected to be cleaned up by
-   * [MultipartRequestEventListener] on request completion.
-   *
-   * @return The newly created temp directory.
-   */
-  private fun initTmpDir(): File {
-    // Create a new temp directory with a name that should not conflict with
-    // anything else.
-    val out = File(tempDirectory, UUID.randomUUID().toString())
-      .also { it.mkdir() }
-
-    // Attach the new directory to the request, so we can clean it up later.
-    request.setProperty(TempDirProperty, out)
-
-    // Return the new temp directory.
-    return out
-  }
-
   @Suppress("NOTHING_TO_INLINE")
   private inline fun MediaType.requireBoundary() = parameters["boundary"]
     ?: throw BadRequestException("Content-Type header missing boundary string.")
 
   @Suppress("NOTHING_TO_INLINE")
   private inline fun MediaType.requireBoundaryBytes() = requireBoundary().toByteArray()
-
 
   companion object {
 
@@ -238,16 +214,5 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     //       as needed by the specific service.  Consider using the jackson
     //       singleton library.
     var mapper = ObjectMapper()
-
-    var tempDirectory = File("/tmp")
-      set(value) {
-        if (!value.exists())
-          throw IllegalStateException("Cannot use temp directory that does not exist.")
-
-        if (!value.isDirectory)
-          throw IllegalStateException("Temp path must be a directory.")
-
-        field = value
-      }
   }
 }

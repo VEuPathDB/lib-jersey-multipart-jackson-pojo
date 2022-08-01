@@ -3,8 +3,6 @@ package derp;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
-import java.io.File;
-
 @Path("/")
 public class Controller {
 
@@ -20,8 +18,10 @@ public class Controller {
   @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.TEXT_PLAIN)
-  public void post(File model) {
+  public void post(Model model) {
     System.out.println("In the controller.");
     System.out.println(model);
+    System.out.println(model.getFoo());
+    System.out.println(model.getBar());
   }
 }

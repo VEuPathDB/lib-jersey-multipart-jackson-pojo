@@ -35,7 +35,7 @@ class MultipartApplicationEventListener : ApplicationEventListener {
    */
   override fun onRequest(requestEvent: RequestEvent) =
     if (requestEvent.isMultipart())
-      MultipartRequestEventListener()
+      MultipartRequestEventListener(requestEvent)
     else
       null
 }

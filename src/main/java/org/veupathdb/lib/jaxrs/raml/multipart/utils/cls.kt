@@ -1,21 +1,27 @@
 package org.veupathdb.lib.jaxrs.raml.multipart.utils
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSetter
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 
 internal fun Class<Any>.fieldsMap(): Map<String, Class<*>> {
   val out = HashMap<String, Class<*>>(1)
 
   // Look through all the methods on the class for our targets
   for (method in methods) {
+    if (method.isStatic())
+      continue
+
     // If the method doesn't take a single parameter it's not a plain setter,
     // and we can ignore it.
     if (method.parameterCount != 1)
+      continue
 
     // If the method isn't a setter, ignore it.
-      if (!method.name.startsWith("set"))
-        continue
+    if (!method.name.startsWith("set"))
+      continue
 
     // Get the jackson annotated field name (or ignore the field if it has
     // no such name).
@@ -25,6 +31,25 @@ internal fun Class<Any>.fieldsMap(): Map<String, Class<*>> {
   return out
 }
 
+internal fun Class<Any>.getJacksonConstructor(): Method? {
+
+  for (method in methods) {
+    // Sift out any non-static methods
+    if (!method.isStatic())
+      continue
+
+    // Sift out any methods that don't take exactly one parameter
+    if (method.parameterCount != 1)
+      continue
+
+    if (method.hasJacksonCreatorAnnotation())
+      return method
+  }
+
+  return null
+}
+
+private fun Method.isStatic() = Modifier.isStatic(modifiers)
 
 private fun Method.getJacksonName(): String? {
   for (ann in annotations) {
@@ -35,4 +60,13 @@ private fun Method.getJacksonName(): String? {
   }
 
   return null
+}
+
+private fun Method.hasJacksonCreatorAnnotation(): Boolean {
+  for (annotation in annotations) {
+    if (annotation is JsonCreator)
+      return true
+  }
+
+  return false
 }
