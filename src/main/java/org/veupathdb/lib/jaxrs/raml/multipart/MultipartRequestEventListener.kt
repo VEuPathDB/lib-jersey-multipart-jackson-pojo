@@ -2,6 +2,9 @@ package org.veupathdb.lib.jaxrs.raml.multipart
 
 import org.glassfish.jersey.server.monitoring.RequestEvent
 import org.glassfish.jersey.server.monitoring.RequestEventListener
+import org.veupathdb.lib.jaxrs.raml.multipart.utils.createTempDirectory
+import org.veupathdb.lib.jaxrs.raml.multipart.utils.deleteTempDirectory
+import org.veupathdb.lib.jaxrs.raml.multipart.utils.isMultipart
 import java.io.File
 
 /**
@@ -40,13 +43,18 @@ class MultipartRequestEventListener : RequestEventListener {
    */
   override fun onEvent(event: RequestEvent) {
     if (event.type == RequestEvent.Type.START)
+      onRequestStart(event)
+    if (event.type == RequestEvent.Type.FINISHED)
+      onRequestEnd(event)
+  }
 
+  private fun onRequestStart(event: RequestEvent) {
+    if (event.containerRequest.isMultipart())
+      event.containerRequest.headers.add(TempDirHeader, event.containerRequest.createTempDirectory().path)
+  }
 
-    // Ignore all events but "FINISHED".
-    if (event.type != RequestEvent.Type.FINISHED)
-      return
-
-    // On request completion, clean up any temp dir left behind.
-    (event.containerRequest.getProperty(TempDirProperty) as File?)?.deleteRecursively()
+  private fun onRequestEnd(event: RequestEvent) {
+    if (event.containerRequest.isMultipart())
+      event.containerRequest.deleteTempDirectory()
   }
 }

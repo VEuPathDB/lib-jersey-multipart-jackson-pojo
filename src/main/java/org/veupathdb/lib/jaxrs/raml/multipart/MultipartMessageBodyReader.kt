@@ -2,6 +2,7 @@ package org.veupathdb.lib.jaxrs.raml.multipart
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.ws.rs.BadRequestException
+import jakarta.ws.rs.InternalServerErrorException
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.MultivaluedMap
 import jakarta.ws.rs.ext.MessageBodyReader
@@ -25,6 +26,13 @@ private const val BufferSize = 8192
 //         or implement/use a streaming base64 decode to get the raw value on
 //         pipe to output stream.
 //       - Test file upload to non-file POJO property
+// TODO: Jersey's default file input handler kicks in and takes priority over
+//       this type, resulting in a file input that contains the entirety of the
+//       request body which is incorrect.
+//       Need to find a way to disable or override that behavior to use this
+//       message body reader instead.
+// TODO: does the apache stream decode the base64 wrapping the raw file content?
+
 
 
 
@@ -58,9 +66,13 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // Open a stream over the contents of the multipart/form-data body.
     val stream = MultipartStream(entityStream, mediaType.requireBoundaryBytes(), BufferSize, null)
 
+    // Get hold of the temp directory assigned to this multipart request.
+    val tmpDir = httpHeaders.getTempDirectory()
+      ?: throw InternalServerErrorException("Multipart request made it to the MessageBodyReader with no temp directory")
+
     // If the method just takes a raw file as an input:
     if (File::class.java.isAssignableFrom(type))
-      return fileReadFrom(stream)
+      return fileReadFrom(stream, tmpDir)
         .also { entityStream.close() }
 
     // If the method takes an Enum type as an input:
@@ -71,16 +83,14 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // TODO: Map and Collection?
 
     // Else, assume the type is a POJO and deserialize accordingly:
-    return pojoReadFrom(type, stream)
+    return pojoReadFrom(type, stream, tmpDir)
   }
 
   /**
    * Reads the contents of the first segment of the input body into a file then
    * returns that file.
-   *
-   *
    */
-  private fun fileReadFrom(stream: MultipartStream): File {
+  private fun fileReadFrom(stream: MultipartStream, tmpDir: File): File {
     // Skip over any extra stuff to get to the first content section.
     stream.skipPreamble()
       || throw BadRequestException("Missing body content.")
@@ -92,15 +102,6 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // Get the file name or provide a name for the file if no filename was sent
     // in with the request.
     val fileName = cont.getFileName() ?: cont.getFormName() ?: DefaultFileName
-
-    // Create a temp directory to hold the uploaded file.
-    //
-    // We do it this way so the file can keep its original name since the name
-    // of the returned file is the only way for us to communicate the original
-    // file name to the controller method.
-    val tmpDir = initTmpDir()
-
-    // TODO: mark the tmpDir to be removed somehow
 
     // Create the upload file and populate it with the contents of the stream.
     return File(tmpDir, fileName).apply {
@@ -127,21 +128,18 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
    * segment of the input body.
    */
   private fun enumReadFrom(type: Class<Any>, stream: MultipartStream): Any {
-    TODO("fuck.  we need to find the @JsonCreator static method on the enum" +
+    TODO("damn.  we need to find the @JsonCreator static method on the enum" +
       " class, figure out what type of input it takes, then try and convert" +
       " the raw text we were given into the expected type.")
   }
 
-  private fun pojoReadFrom(type: Class<Any>, stream: MultipartStream): Any {
+  private fun pojoReadFrom(type: Class<Any>, stream: MultipartStream, tmpDir: File): Any {
     // If the method takes something other than a file, then assume it's a pojo
     // and attempt to deserialize into a map that will be converted into that
     // pojo type.
     //
     // NOTE: We don't try and deserialize into the pojo itself because it may be
     // an interface, an enum, or a pojo with zero no-arg constructors.
-
-    // TODO: does the apache stream decode the base64 wrapping the raw file
-    //       content?
 
 
     val temp = HashMap<String, Any>()
@@ -150,7 +148,6 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       return mapper.convertValue(temp, type)
 
     val fields = type.fieldsMap()
-    val tmpDir = initTmpDir()
 
     do {
       val headers     = stream.parseHeaders()

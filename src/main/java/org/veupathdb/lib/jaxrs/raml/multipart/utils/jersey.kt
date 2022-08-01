@@ -3,6 +3,7 @@
 package org.veupathdb.lib.jaxrs.raml.multipart.utils
 
 import jakarta.ws.rs.core.HttpHeaders
+import jakarta.ws.rs.core.MediaType
 import org.glassfish.jersey.server.ContainerRequest
 import org.glassfish.jersey.server.monitoring.RequestEvent
 
@@ -29,13 +30,4 @@ internal inline fun RequestEvent.isMultipart() =
  * `false`.
  */
 internal inline fun ContainerRequest.isMultipart() =
-  getRequestHeader(HttpHeaders.CONTENT_TYPE)?.isMultipart() ?: false
-
-/**
- * Tests whether the given list of header values contains an entry for
- * `multipart/form-data`.
- *
- * @receiver List of header values.
- */
-internal inline fun List<String>.isMultipart() =
-  any { it.indexOf("multipart/form-data") > -1 }
+  mediaType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
