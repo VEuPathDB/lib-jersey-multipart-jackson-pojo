@@ -42,7 +42,12 @@ internal fun Class<Any>.getJacksonConstructor(): Method? {
     if (method.parameterCount != 1)
       continue
 
-    if (method.hasJacksonCreatorAnnotation())
+    // Sift out any methods that don't have the JsonCreator annotation
+    if (!method.hasJacksonCreatorAnnotation())
+      continue
+
+    // Find the first method that returns a type compatible with this type.
+    if (isAssignableFrom(method.returnType))
       return method
   }
 

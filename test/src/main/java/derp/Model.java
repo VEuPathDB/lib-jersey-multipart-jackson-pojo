@@ -13,6 +13,9 @@ public class Model {
   @JsonProperty("bar")
   private File bar;
 
+  @JsonProperty("fizz")
+  private SomeEnum fizz;
+
   @JsonGetter("foo")
   public String getFoo() {
     return foo;
@@ -31,5 +34,15 @@ public class Model {
   @JsonSetter("bar")
   public void setBar(File bar) {
     this.bar = bar;
+  }
+
+  @JsonGetter("fizz")
+  public SomeEnum getFizz() {
+    return fizz;
+  }
+
+  @JsonSetter("fizz")
+  public void setFizz(SomeEnum fizz) {
+    this.fizz = fizz;
   }
 }

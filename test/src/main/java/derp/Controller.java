@@ -20,5 +20,6 @@ public class Controller {
     System.out.println(model);
     System.out.println(model.getFoo());
     System.out.println(model.getBar());
+    System.out.println(model.getFizz());
   }
 }

@@ -55,13 +55,11 @@ class MultipartRequestEventListener(event: RequestEvent) : RequestEventListener 
   }
 
   private fun onRequestStart(event: RequestEvent) {
-    println("onRequestStart")
     if (event.isMultipart())
       event.containerRequest.headers.add(TempDirHeader, event.containerRequest.createTempDirectory().path)
   }
 
   private fun onRequestEnd(event: RequestEvent) {
-    println("onRequestEnd")
     if (event.isMultipart())
       event.containerRequest.deleteTempDirectory()
   }

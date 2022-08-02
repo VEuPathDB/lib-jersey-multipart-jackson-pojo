@@ -1,5 +1,6 @@
 package org.veupathdb.lib.jaxrs.raml.multipart
 
+import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
@@ -40,9 +41,6 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     httpHeaders: MultivaluedMap<String, String>,
     entityStream: InputStream,
   ): Any {
-    println("in the filter")
-    println(genericType)
-
     // Open a stream over the contents of the multipart/form-data body.
     val stream = MultipartStream(entityStream, mediaType.requireBoundaryBytes(), BufferSize, null)
 
@@ -92,13 +90,13 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
   /**
    * Attempts to parse the contents of the first segment of the input body as
-   * the type expected by the static constructor of the given enum [type].
+   * the type expected by the static "constructor" of the given enum [type].
    *
-   * The given enum [type] must have a static constructor annotated with the
+   * The given enum [type] must have a static "constructor" annotated with the
    * Jackson `@JsonCreator` annotation.
    *
-   * If no such annotated static constructor method is found on the type this
-   * method will throw a 500 exception.
+   * If no such annotated static method is found on the type this method will
+   * throw a 500 exception.
    *
    * @param type Class for the enum type that should be instantiated.
    *
@@ -108,14 +106,27 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
    * segment of the input body.
    */
   private fun enumReadFrom(type: Class<Any>, stream: MultipartStream): Any {
+    // Locate the static method that will give us an instance of the target
+    // enum.
+    //
+    // This method will be annotated with the jackson `@JsonCreator` annotation.
+    //
+    // If no such method exists, throw a 500 exception as the server source code
+    // is invalid.
     val constructor = type.getJacksonConstructor()
       ?: throw InternalServerErrorException("Cannot construct instance of $type from multipart/form-data input.")
 
+    // Skip over the prefix information, headers, etc...
+    stream.skipPreamble()
+      || throw BadRequestException("Missing body content.")
 
+    // Attempt to read the first part of the body as the generic type defined by
+    // the constructor method's input parameter.
+    val inp = mapper.readValue<Any>(stream.contentToString(maxVariableSize),
+      mapper.typeFactory.constructType(constructor.genericParameterTypes[0]))
 
-    TODO("damn.  we need to find the @JsonCreator static method on the enum" +
-      " class, figure out what type of input it takes, then try and convert" +
-      " the raw text we were given into the expected type.")
+    // Return the result of calling the target method.
+    return constructor.invoke(null, inp)
   }
 
   private fun pojoReadFrom(type: Class<Any>, stream: MultipartStream, tmpDir: File): Any {
