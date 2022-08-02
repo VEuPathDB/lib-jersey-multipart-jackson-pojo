@@ -16,15 +16,6 @@ private const val DefaultFileName = "upload"
 
 private const val BufferSize = 8192
 
-////////////////////////////////////////////////////////////////////////////////
-//
-//   TODOS!!
-//
-
-
-
-
-
 class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
   /**
@@ -180,7 +171,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
       } else {
         // Do regular parse
-        temp[fieldName] = stream.readContentAsJsonNode()
+        temp[fieldName] = stream.readContentAsJsonNode(maxVariableSize)
       }
 
     } while (stream.readBoundary())
@@ -206,6 +197,16 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // TODO: make this static and expose it so it can be configured with extras
     //       as needed by the specific service.  Consider using the jackson
     //       singleton library.
+    @JvmStatic
     var mapper = ObjectMapper()
+
+    /**
+     * Max size for a single non-file field that will be read into memory as
+     * part of a POJO.
+     *
+     * Defaults to 16MiB.
+     */
+    @JvmStatic
+    var maxVariableSize = 16_777_216
   }
 }

@@ -16,12 +16,9 @@ private const val FormNamePrefix = "name="
 private const val FileNamePrefix = "filename="
 
 
-// TODO: what happens if the content is huge?  we are already in too deep by
-//       the time we know with this approach.  We would need to bail while
-//       filling byte buffer once we hit some threshold to be safe here.
-internal fun MultipartStream.contentToString() =
+internal fun MultipartStream.contentToString(maxSize: Int) =
   ByteArrayOutputStream(8192).let {
-    if (readBodyData(it) == 0)
+    if (readBodyData(CappedOutputStream(maxSize, it)) == 0)
       ""
     else
       it.toByteArray().decodeToString()
@@ -52,8 +49,8 @@ internal fun String?.parseHeaders(): Map<String, List<String>> {
   return out
 }
 
-internal fun MultipartStream.readContentAsJsonNode() =
-  contentToString().let {
+internal fun MultipartStream.readContentAsJsonNode(maxSize: Int) =
+  contentToString(maxSize).let {
     try {
       MultipartMessageBodyReader.mapper.readTree(it)
     } catch (e: JsonParseException) {
