@@ -3,7 +3,7 @@ plugins {
   `maven-publish`
 }
 
-group = "org.example"
+group = "org.veupathdb.lib"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -59,8 +59,8 @@ publishing {
     create<MavenPublication>("gpr") {
       from(components["java"])
       pom {
-        name.set("S3 Workspaces")
-        description.set("Workspaces backed by an S3 object store.")
+        name.set("JaxRS Multipart for Jackson POJOs")
+        description.set("Support for parsing Jackson POJOs from multipart/form-data request bodies.")
         url.set("https://github.com/VEuPathDB/lib-jersey-multipart-jackson-pojo")
         developers {
           developer {
