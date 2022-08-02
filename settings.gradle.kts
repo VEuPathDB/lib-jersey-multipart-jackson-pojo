@@ -1,2 +1,3 @@
-rootProject.name = "multipart-play"
+rootProject.name = "jaxrs-multipart-jackson-pojo"
 
+include(":lib", ":test")
