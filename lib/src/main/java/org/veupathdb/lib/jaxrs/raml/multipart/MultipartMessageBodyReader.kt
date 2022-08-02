@@ -120,10 +120,15 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     stream.skipPreamble()
       || throw BadRequestException("Missing body content.")
 
+    // Skip over the headers
+    stream.readHeaders()
+
     // Attempt to read the first part of the body as the generic type defined by
     // the constructor method's input parameter.
-    val inp = mapper.readValue<Any>(stream.contentToString(maxVariableSize),
-      mapper.typeFactory.constructType(constructor.genericParameterTypes[0]))
+    val inp = mapper.convertValue<Any>(
+      stream.readContentAsJsonNode(maxVariableSize),
+      mapper.typeFactory.constructType(constructor.genericParameterTypes[0])
+    )
 
     // Return the result of calling the target method.
     return constructor.invoke(null, inp)
@@ -134,7 +139,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // an interface, an enum, or a pojo with zero no-arg constructors.
     val temp = HashMap<String, Any>()
 
-    // Skip over the initial header info that is not needed for our parsing.\
+    // Skip over the initial header info that is not needed for our parsing.
     //
     // If this method returns false, then there is nothing in the body, so we
     // can attempt to convert our empty map to the pojo now and bail.

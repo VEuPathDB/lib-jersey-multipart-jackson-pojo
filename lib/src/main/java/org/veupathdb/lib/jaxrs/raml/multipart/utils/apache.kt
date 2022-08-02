@@ -54,7 +54,7 @@ internal fun MultipartStream.readContentAsJsonNode(maxSize: Int) =
     try {
       MultipartMessageBodyReader.mapper.readTree(it)
     } catch (e: JsonParseException) {
-      MultipartMessageBodyReader.mapper.convertValue(it, JsonNode::class.java)
+      MultipartMessageBodyReader.mapper.readTree("\"$it\"")
     }
   }
 

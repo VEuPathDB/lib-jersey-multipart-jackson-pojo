@@ -12,6 +12,8 @@ class ErrorMapper : ExceptionMapper<Throwable> {
       else  -> 500
     }
 
+    exception.printStackTrace()
+
     return Response.status(code).entity(exception.message).build()
   }
 }

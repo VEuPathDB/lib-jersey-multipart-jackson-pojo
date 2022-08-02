@@ -13,13 +13,22 @@ public class Controller {
   }
 
   @POST
+  @Path("model")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.TEXT_PLAIN)
-  public void post(Model model) {
+  public void postModel(Model model) {
     System.out.println("In the controller.");
     System.out.println(model);
     System.out.println(model.getFoo());
     System.out.println(model.getBar());
     System.out.println(model.getFizz());
+  }
+
+  @POST
+  @Path("enum")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Produces(MediaType.TEXT_PLAIN)
+  public void postEnum(SomeEnum derp) {
+    System.out.println(derp);
   }
 }
