@@ -20,14 +20,6 @@ private const val BufferSize = 8192
 //
 //   TODOS!!
 //
-// TODO: Jersey's default file input handler kicks in and takes priority over
-//       this type, resulting in a file input that contains the entirety of the
-//       request body which is incorrect.
-//       Need to find a way to disable or override that behavior to use this
-//       message body reader instead.
-// TODO: does the apache stream decode the base64 wrapping the raw file content?
-// TODO: Size cap on non-file segments.  Someone could upload a 5 gig file as an
-//       int value.
 
 
 
@@ -58,6 +50,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     entityStream: InputStream,
   ): Any {
     println("in the filter")
+    println(genericType)
 
     // Open a stream over the contents of the multipart/form-data body.
     val stream = MultipartStream(entityStream, mediaType.requireBoundaryBytes(), BufferSize, null)

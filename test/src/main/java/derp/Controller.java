@@ -12,9 +12,6 @@ public class Controller {
     return "Goodbye cruel world.";
   }
 
-  // TODO: When the input parameter is of type file, the multipart filter isn't
-  //       used.  Instead some default jersey serializer is used that copies the
-  //       full multipart body into the file.
   @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.TEXT_PLAIN)
