@@ -134,6 +134,22 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     return constructor.invoke(null, inp)
   }
 
+  /**
+   * Attempts to parse the contents of the full input body by mapping the parts
+   * to setters on the pojo that are annotated with Jackson's `@JsonSetter`
+   * annotation.
+   *
+   * @param type Type of the POJO that will be parsed from the multipart body.
+   *
+   * @param stream Incoming request body.
+   *
+   * @param tmpDir Temporary directory for this request.  This directory will be
+   * used to hold any files associated with the request.  Files are only needed
+   * in the case when the target POJO defines one or more fields that are of
+   * type `File`.
+   *
+   * @return The parsed POJO value.
+   */
   private fun pojoReadFrom(type: Class<Any>, stream: MultipartStream, tmpDir: File): Any {
     // NOTE: We don't try and deserialize into the pojo itself because it may be
     // an interface, an enum, or a pojo with zero no-arg constructors.
@@ -150,39 +166,33 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     val fields = type.fieldsMap()
 
     do {
+      // Parse the headers for the current body part.
       val headers     = stream.parseHeaders()
+
+      // Get the content-disposition header.
       val contentDisp = headers.getContentDisposition()
         ?: throw BadRequestException("Bad multipart section, missing Content-Disposition header.")
 
+      // Get the name of the form field.  this name will be used to map the
+      // field to the POJO setter.
       val fieldName = contentDisp.getFormName()
         ?: throw BadRequestException("Bad multipart section, no form field name provided.")
 
-      // Match the field name to a field on the conversion type.
-      //
-      // If a match IS found AND the type of the field IS File, write the
-      // contents of this form-data section to file and assign the file ref to
-      // the temp map.
-      //
-      // If a match IS found AND the type of the field IS NOT File, attempt to
-      // convert the value to the target type.
-      //
-      //     If the target type is primitive, attempt the conversion ourselves,
-      //     if the target type is complex, attempt to parse the value as JSON
-      //     and put a JsonNode instance into the temp map.
-      //
-      // If a match IS NOT found, attempt to wrap the value as JSON and put a
-      // JsonNode into the temp map, if that is not possible put the value in
-      // the map as a string.
-
+      // If the target field is of type `File`...
       if (fields[fieldName] == File::class.java) {
+        // Figure out what we should name the file.  Prefer the original file
+        // name if available, otherwise use the form field name.
         val fileName = contentDisp.getFileName()
           ?: fieldName
 
+        // Copy the data from the body part into a temp file to back the POJO
+        // field.
         val file = File(tmpDir, fileName).apply {
           createNewFile()
           outputStream().use { stream.readBodyData(it) }
         }
 
+        // Assign the file value to our temp map.
         temp[fieldName] = file
 
       } else {
