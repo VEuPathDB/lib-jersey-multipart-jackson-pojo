@@ -1,7 +1,6 @@
 package org.veupathdb.lib.jaxrs.raml.multipart.utils
 
 import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonNode
 import jakarta.ws.rs.BadRequestException
 import org.apache.commons.fileupload.MultipartStream
 import org.veupathdb.lib.jaxrs.raml.multipart.MultipartMessageBodyReader

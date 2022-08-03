@@ -1,6 +1,5 @@
 package org.veupathdb.lib.jaxrs.raml.multipart
 
-import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException

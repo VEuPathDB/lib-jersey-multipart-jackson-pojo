@@ -9,16 +9,13 @@ import org.veupathdb.lib.jaxrs.raml.multipart.utils.isMultipart
 /**
  * Multipart Request Event Listener
  *
- * Jersey request event listener specifically meant for performing cleanup after
- * request completion.
+ * Jersey request event listener that assigns a temporary directory to a request
+ * on request start, then removes that directory on request finish.
  *
- * This listener does not care if the completion status was success or failure.
- *
- * Request events before the request completion event are ignored.
- *
- * On receipt of the request completion event, this listener will attempt to
- * remove a temp directory created for a `multipart/form-data` request which
- * contained file uploads.
+ * On creation of this event listener, a temp directory will be created for the
+ * request that this listener is attached to.  On request completion, this
+ * listener will remove the created temp directory and any of it's remaining
+ * contents.
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
@@ -39,17 +36,12 @@ class MultipartRequestEventListener(event: RequestEvent) : RequestEventListener 
    * signifies the Jersey request processing has completed.
    *
    * If the given event _is_ a `FINISHED` event, this method will attempt to
-   * remove a temp directory which will have been associated with the request
-   * for `multipart/form-data` requests containing file uploads.
-   *
-   * If the request does not have a temp directory associated with it, this
-   * method does nothing.
+   * remove the temp directory associated with the request by this event
+   * listener.
    *
    * @param event Request event.
    */
   override fun onEvent(event: RequestEvent) {
-    if (event.type == RequestEvent.Type.START)
-      onRequestStart(event)
     if (event.type == RequestEvent.Type.FINISHED)
       onRequestEnd(event)
   }

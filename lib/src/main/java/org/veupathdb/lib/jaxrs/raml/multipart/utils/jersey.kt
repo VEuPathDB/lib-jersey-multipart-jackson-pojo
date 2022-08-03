@@ -2,7 +2,6 @@
 
 package org.veupathdb.lib.jaxrs.raml.multipart.utils
 
-import jakarta.ws.rs.core.HttpHeaders
 import jakarta.ws.rs.core.MediaType
 import org.glassfish.jersey.server.ContainerRequest
 import org.glassfish.jersey.server.monitoring.RequestEvent
