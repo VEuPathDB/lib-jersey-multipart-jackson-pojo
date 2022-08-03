@@ -1,0 +1,10 @@
+= Jersey Multipart for Jackson POJOs
+
+
+== Usage
+
+[source, java]
+----
+register(MultipartMessageBodyReader.class);
+register(MultipartApplicationEventListener.class);
+----
