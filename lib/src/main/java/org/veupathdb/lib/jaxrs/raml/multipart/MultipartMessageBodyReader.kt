@@ -61,6 +61,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
     // Else, assume the type is a POJO and deserialize accordingly:
     return pojoReadFrom(type, stream, tmpDir)
+      .also { entityStream.close() }
   }
 
   /**
