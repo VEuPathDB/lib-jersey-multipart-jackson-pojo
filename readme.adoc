@@ -1,5 +1,7 @@
 = Jersey Multipart for Jackson POJOs
 
+Jersey message body reader and event listener for parsing `multipart/form-data`
+requests into Jackson annotated POJOs.
 
 == Usage
 
@@ -7,4 +9,29 @@
 ----
 register(MultipartMessageBodyReader.class);
 register(MultipartApplicationEventListener.class);
+----
+
+
+=== Example
+
+.*Controller Method*
+[source, java]
+----
+@POST
+@Consumes(MediaType.MULTIPART_FORM_DATA)
+public void myController(SomePOJO pojo) {
+  ...
+}
+----
+
+.*Input POJO*
+[source, java]
+----
+public class SomePOJO {
+  @JsonSetter("foo")
+  public void setFoo(String foo) { ... }
+
+  @JsonSetter("bar")
+  public void setBar(File bar) { ... }
+}
 ----
