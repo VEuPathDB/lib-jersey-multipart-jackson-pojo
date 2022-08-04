@@ -240,9 +240,8 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
   companion object {
 
     // Jackson
-    // TODO: make this static and expose it so it can be configured with extras
-    //       as needed by the specific service.  Consider using the jackson
-    //       singleton library.
+    // TODO: Consider using the jackson singleton library instead of having this
+    //       separate mapper that requires configuration.
     @JvmStatic
     var mapper = ObjectMapper()
 
