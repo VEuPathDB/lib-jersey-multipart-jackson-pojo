@@ -16,6 +16,18 @@ private const val DefaultFileName = "upload"
 
 private const val BufferSize = 8192
 
+/**
+ * Multipart Form-Data Message Body Reader
+ *
+ * JaxRS [MessageBodyReader] implementation that handles parsing
+ * `multipart/form-data` request bodies into target POJO types.
+ *
+ * The target POJO type is defined as the request entity input parameter on the
+ * service controller method handling the `multipart/form-data` request.
+ *
+ * @author Elizabeth Paige Harper - https://github.com/foxcapades
+ * @since 1.0.0
+ */
 class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
   /**
@@ -32,6 +44,14 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     mediaType: MediaType,
   ) = mediaType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
 
+
+  /**
+   * Parses a value of the target [type] from the given input
+   * [entity][entityStream].
+   *
+   * @return A value of the target [type] parsed from one or more parts of the
+   * multipart input stream.
+   */
   override fun readFrom(
     type: Class<Any>,
     genericType: Type,
