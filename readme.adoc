@@ -57,7 +57,25 @@ This method expects the form params `foo`, `bar`, and `fizz` as per the
 link:test/src/main/java/derp/Model.java[model class] that the quest will be
 parsed into.
 +
-See the model class definition for more information about the expected content of those fields.
+.*Model Class Fields*
+--
+[cols="1m,1,4"]
+|===
+| Field | Allowed Values | Description
+
+| foo
+| Any String
+| A string parameter.
+
+| bar
+| Any file or value
+| A file parameter.
+
+| fizz
+m| "some value"
+| An enum parameter
+|===
+--
 
 `/enum`::
 Logs the enum value parsed from the input request.
