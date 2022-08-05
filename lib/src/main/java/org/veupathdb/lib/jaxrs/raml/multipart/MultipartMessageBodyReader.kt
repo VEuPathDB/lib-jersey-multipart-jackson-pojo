@@ -156,8 +156,8 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
   /**
    * Attempts to parse the contents of the full input body by mapping the parts
-   * to setters on the pojo that are annotated with Jackson's `@JsonSetter`
-   * annotation.
+   * to setters on the pojo that are annotated with Jackson's `@JsonSetter` or
+   * `@JsonProperty` annotations.
    *
    * @param type Type of the POJO that will be parsed from the multipart body.
    *
@@ -187,7 +187,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
     do {
       // Parse the headers for the current body part.
-      val headers     = stream.parseHeaders()
+      val headers = stream.parseHeaders()
 
       // Get the content-disposition header.
       val contentDisp = headers.getContentDisposition()
