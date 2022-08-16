@@ -22,13 +22,14 @@ public class Controller {
     System.out.println(model.getFoo());
     System.out.println(model.getBar());
     System.out.println(model.getFizz());
+    System.out.println(model.getBuzz());
   }
 
   @POST
   @Path("enum")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.TEXT_PLAIN)
-  public void postEnum(SomeEnum derp) {
+  public void postEnum(EnumWithConstructor derp) {
     System.out.println(derp);
   }
 }

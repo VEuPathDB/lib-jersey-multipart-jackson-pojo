@@ -2,18 +2,18 @@ package derp;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public enum SomeEnum {
+public enum EnumWithConstructor {
   SomeValue("some value");
 
   public final String value;
 
-  SomeEnum(String value) {
+  EnumWithConstructor(String value) {
     this.value = value;
   }
 
   @JsonCreator
-  public static SomeEnum fromString(String value) {
-    for (SomeEnum val : values())
+  public static EnumWithConstructor fromString(String value) {
+    for (EnumWithConstructor val : values())
       if (val.value.equals(value))
         return val;
 

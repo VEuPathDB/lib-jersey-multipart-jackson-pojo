@@ -54,6 +54,23 @@ internal fun Class<Any>.getJacksonConstructor(): Method? {
   return null
 }
 
+internal fun Class<Any>.getJacksonAnnotatedEnumProperties(): Map<String, Any> {
+  val out = HashMap<String, Any>(enumConstants.size)
+
+  for (field in declaredFields) {
+    if (!field.isEnumConstant)
+      continue
+
+    for (ann in field.annotations) {
+      if (ann is JsonProperty) {
+        out[ann.value] = field
+      }
+    }
+  }
+
+  return out
+}
+
 private fun Method.isStatic() = Modifier.isStatic(modifiers)
 
 private fun Method.getJacksonName(): String? {

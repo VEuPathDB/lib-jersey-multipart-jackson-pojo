@@ -17,7 +17,7 @@ class CappedOutputStream(
 
   override fun write(b: Int) {
     if (++written > maxBytes)
-      throw BadRequestException("Form field exceeded max number of bytes: $maxBytes")
+      throw BadRequestException("Form field exceeded maximum allowed number of bytes: $maxBytes")
 
     stream.write(b)
   }

@@ -37,7 +37,6 @@ internal fun String?.parseHeaders(): Map<String, List<String>> {
     if (headerLine.isBlank())
       continue
 
-    println(headerLine)
     if (headerLine.indexOf(':') < 1)
       throw BadRequestException("Malformed multipart/form-data body part header.")
 
@@ -53,7 +52,7 @@ internal fun MultipartStream.readContentAsJsonNode(maxSize: Int) =
     try {
       MultipartMessageBodyReader.mapper.readTree(it)
     } catch (e: JsonParseException) {
-      MultipartMessageBodyReader.mapper.readTree(it)
+      MultipartMessageBodyReader.mapper.readTree("\"$it\"")
     }
   }
 

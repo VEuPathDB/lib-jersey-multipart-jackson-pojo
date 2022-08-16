@@ -6,6 +6,7 @@ import jakarta.ws.rs.InternalServerErrorException
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.MultivaluedMap
 import jakarta.ws.rs.ext.MessageBodyReader
+import jakarta.ws.rs.ext.Provider
 import org.apache.commons.fileupload.MultipartStream
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.*
 import java.io.File
@@ -28,6 +29,7 @@ private const val BufferSize = 8192
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
+@Provider
 class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
   /**
@@ -126,16 +128,6 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
    * segment of the input body.
    */
   private fun enumReadFrom(type: Class<Any>, stream: MultipartStream): Any {
-    // Locate the static method that will give us an instance of the target
-    // enum.
-    //
-    // This method will be annotated with the jackson `@JsonCreator` annotation.
-    //
-    // If no such method exists, throw a 500 exception as the server source code
-    // is invalid.
-    val constructor = type.getJacksonConstructor()
-      ?: throw InternalServerErrorException("Cannot construct instance of $type from multipart/form-data input.")
-
     // Skip over the prefix information, headers, etc...
     stream.skipPreamble()
       || throw BadRequestException("Missing body content.")
@@ -143,15 +135,45 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // Skip over the headers
     stream.readHeaders()
 
-    // Attempt to read the first part of the body as the generic type defined by
-    // the constructor method's input parameter.
-    val inp = mapper.convertValue<Any>(
-      stream.readContentAsJsonNode(maxVariableSize),
-      mapper.typeFactory.constructType(constructor.genericParameterTypes[0])
-    )
+    // Attempt to locate a static method to use as the jackson "constructor"
+    // (will be annotated with @JsonCreator) to get an instance of the type from
+    // the value.
+    val constructor = type.getJacksonConstructor()
 
-    // Return the result of calling the target method.
-    return constructor.invoke(null, inp)
+    if (constructor != null) {
+      // Attempt to read the first part of the body as the generic type defined by
+      // the constructor method's input parameter.
+      val inp = mapper.convertValue<Any>(
+        stream.readContentAsJsonNode(maxVariableSize),
+        mapper.typeFactory.constructType(constructor.genericParameterTypes[0])
+      )
+
+      // Return the result of calling the target method.
+      return constructor.invoke(null, inp)
+    }
+
+    // There was no static @JsonCreator annotated method to use to get hold of
+    // an instance of the enum.
+
+    // Look for fields annotated with @JsonProperty as a secondary approach to
+    // trying to get an enum value.
+    val fields = type.getJacksonAnnotatedEnumProperties()
+
+    if (fields.isNotEmpty()) {
+      // Get the size of the largest valid key
+      val largestKeyLength = fields.keys.stream()
+        .map { it.toByteArray() }
+        .mapToInt { it.size }
+        .max()
+        .asInt
+
+      val inp = stream.contentToString(largestKeyLength)
+
+      if (inp in fields)
+        return fields[inp]!!
+    }
+
+    throw InternalServerErrorException("Cannot construct instance of $type from multipart/form-data input.")
   }
 
   /**

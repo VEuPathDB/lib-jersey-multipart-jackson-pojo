@@ -14,7 +14,10 @@ public class Model {
   private File bar;
 
   @JsonProperty("fizz")
-  private SomeEnum fizz;
+  private EnumWithConstructor fizz;
+
+  @JsonProperty("buzz")
+  private EnumWithAnnotations buzz;
 
   @JsonGetter("foo")
   public String getFoo() {
@@ -37,12 +40,18 @@ public class Model {
   }
 
   @JsonGetter("fizz")
-  public SomeEnum getFizz() {
+  public EnumWithConstructor getFizz() {
     return fizz;
   }
 
   @JsonSetter("fizz")
-  public void setFizz(SomeEnum fizz) {
+  public void setFizz(EnumWithConstructor fizz) {
     this.fizz = fizz;
   }
+
+  @JsonGetter("buzz")
+  public EnumWithAnnotations getBuzz() { return buzz; }
+
+  @JsonSetter("buzz")
+  public void setBuzz(EnumWithAnnotations buzz) { this.buzz = buzz; }
 }
