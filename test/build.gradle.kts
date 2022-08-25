@@ -25,13 +25,13 @@ dependencies {
   implementation(kotlin("stdlib-jdk7"))
   implementation(kotlin("stdlib-jdk8"))
 
-  implementation(project(":lib"))
+  implementation(project(":multipart-jackson-pojo"))
 
   implementation("commons-fileupload:commons-fileupload:1.4")
 
-  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.5")
-  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.5")
-  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.5")
+  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.6")
+  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.6")
+  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.6")
   implementation("org.glassfish.hk2:hk2-api:3.0.3")
 
   implementation("com.fasterxml.jackson.core:jackson-databind:2.13.3")
