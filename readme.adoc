@@ -1,0 +1,89 @@
+= Jersey Multipart for Jackson POJOs
+
+Jersey message body reader and event listener for parsing `multipart/form-data`
+requests into Jackson annotated POJOs.
+
+== Usage
+
+[source, java]
+----
+register(MultipartMessageBodyReader.class);
+register(MultipartApplicationEventListener.class);
+----
+
+
+=== Example
+
+.*Controller Method*
+[source, java]
+----
+@POST
+@Consumes(MediaType.MULTIPART_FORM_DATA)
+public void myController(SomePOJO pojo) {
+  ...
+}
+----
+
+.*Input POJO*
+[source, java]
+----
+public class SomePOJO {
+  @JsonSetter("foo")
+  public void setFoo(String foo) { ... }
+
+  @JsonSetter("bar")
+  public void setBar(File bar) { ... }
+}
+----
+
+== Development
+
+=== Testing
+
+A test server using this library can be spun up using the command:
+
+[source, shell]
+----
+./gradlew run
+----
+
+Once this server is online, you may make multipart `POST` requests to the
+service at `localhost:8080` using the following endpoints:
+
+`/model`::
+Logs the properties on the model class parsed from the input request.
++
+This method expects the form params `foo`, `bar`, and `fizz` as per the
+link:test/src/main/java/derp/Model.java[model class] that the quest will be
+parsed into.
++
+.*Model Class Fields*
+--
+[cols="1m,1,4"]
+|===
+| Field | Allowed Values | Description
+
+| foo
+| Any String
+| A string parameter.
+
+| bar
+| Any file or value
+| A file parameter.
+
+| fizz
+m| "some value"
+| An enum parameter
+|===
+--
+
+`/enum`::
+Logs the enum value parsed from the input request.
++
+This method expects at least 1 form parameter with any field name that will be
+parsed into a value on the
+link:test/src/main/java/derp/SomeEnum.java[test enum class].
++
+See the test enum class definition for permissible values.
+
+
