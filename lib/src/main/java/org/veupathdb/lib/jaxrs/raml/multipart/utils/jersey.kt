@@ -29,4 +29,4 @@ internal inline fun RequestEvent.isMultipart() =
  * `false`.
  */
 internal inline fun ContainerRequest.isMultipart() =
-  mediaType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
+  mediaType?.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE) ?: false
