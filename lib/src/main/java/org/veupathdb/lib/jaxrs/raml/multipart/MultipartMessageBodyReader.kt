@@ -249,7 +249,11 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     //   map the part to a field on the POJO type
     //   if the pojo type is type file, pipe part to temp file and assign prop
     //   else parse pojo inline and assign prop
-    return mapper.convertValue(temp, type)
+    try {
+      return mapper.convertValue(temp, type)
+    } catch (e: IllegalArgumentException) {
+      throw BadRequestException("Input did not resemble the expected form.")
+    }
   }
 
   @Suppress("NOTHING_TO_INLINE")
