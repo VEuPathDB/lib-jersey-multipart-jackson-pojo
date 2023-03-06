@@ -23,14 +23,14 @@ dependencies {
   implementation(kotlin("stdlib-jdk7"))
   implementation(kotlin("stdlib-jdk8"))
 
-  implementation("commons-fileupload:commons-fileupload:1.4")
+  implementation("commons-fileupload:commons-fileupload:1.5")
 
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.8")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.8")
   runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.8")
   implementation("org.glassfish.hk2:hk2-api:3.0.3")
 
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.13.4")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.13.4.1")
   implementation("com.fasterxml.jackson.core:jackson-annotations:2.13.4")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")

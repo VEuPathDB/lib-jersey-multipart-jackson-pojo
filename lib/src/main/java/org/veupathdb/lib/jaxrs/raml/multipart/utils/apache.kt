@@ -14,9 +14,11 @@ private const val LCContentDisp  = "content-disposition"
 private const val FormNamePrefix = "name="
 private const val FileNamePrefix = "filename="
 
+private const val InitialBufferSize = 8192
 
-internal fun MultipartStream.contentToString(maxSize: Int) =
-  ByteArrayOutputStream(8192).let {
+
+internal fun MultipartStream.contentToString(maxSize: Long) =
+  ByteArrayOutputStream(InitialBufferSize).let {
     if (readBodyData(CappedOutputStream(maxSize, it)) == 0)
       ""
     else
@@ -47,7 +49,7 @@ internal fun String?.parseHeaders(): Map<String, List<String>> {
   return out
 }
 
-internal fun MultipartStream.readContentAsJsonNode(maxSize: Int) =
+internal fun MultipartStream.readContentAsJsonNode(maxSize: Long) =
   contentToString(maxSize).let {
     try {
       MultipartMessageBodyReader.mapper.readTree(it)

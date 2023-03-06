@@ -7,10 +7,10 @@ import java.io.OutputStream
  * Capped Size Output Stream
  *
  * A simple output stream wrapper that throws an exception if more than the
- * specified max number of bytes is read.
+ * specified max number of bytes is written.
  */
 class CappedOutputStream(
-  private val maxBytes: Int,
+  private val maxBytes: Long,
   private val stream: OutputStream
 ) : OutputStream() {
   private var written = 0

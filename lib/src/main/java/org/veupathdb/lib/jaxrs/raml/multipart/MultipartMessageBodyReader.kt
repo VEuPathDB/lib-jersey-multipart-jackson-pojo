@@ -106,7 +106,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // Create the upload file and populate it with the contents of the stream.
     return File(tmpDir, fileName).apply {
       createNewFile()
-      outputStream().use { stream.readBodyData(it) }
+      outputStream().use { stream.readBodyData(CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, it)) }
     }
   }
 
@@ -144,7 +144,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       // Attempt to read the first part of the body as the generic type defined by
       // the constructor method's input parameter.
       val inp = mapper.convertValue<Any>(
-        stream.readContentAsJsonNode(maxVariableSize),
+        stream.readContentAsJsonNode(JaxRSMultipartUpload.maxInMemoryFieldSize),
         mapper.typeFactory.constructType(constructor.genericParameterTypes[0])
       )
 
@@ -163,9 +163,9 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       // Get the size of the largest valid key
       val largestKeyLength = fields.keys.stream()
         .map { it.toByteArray() }
-        .mapToInt { it.size }
+        .mapToLong { it.size.toLong() }
         .max()
-        .asInt
+        .asLong
 
       val inp = stream.contentToString(largestKeyLength)
 
@@ -278,6 +278,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
      * Defaults to 16MiB.
      */
     @JvmStatic
-    var maxVariableSize = 16_777_216
+    @Deprecated("This field is being replaced in favor of JaxRSMultipartUpload.maxInMemoryFieldSize.")
+    var maxVariableSize = JaxRSMultipartUpload.maxInMemoryFieldSize
   }
 }
