@@ -144,7 +144,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       // Attempt to read the first part of the body as the generic type defined by
       // the constructor method's input parameter.
       val inp = mapper.convertValue<Any>(
-        stream.readContentAsJsonNode(JaxRSMultipartUpload.maxInMemoryFieldSize),
+        stream.readContentAsJsonNode(maxVariableSize),
         mapper.typeFactory.constructType(constructor.genericParameterTypes[0])
       )
 
