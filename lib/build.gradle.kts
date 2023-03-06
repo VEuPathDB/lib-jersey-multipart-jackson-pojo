@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.veupathdb.lib"
-version = "1.0.2"
+version = "1.1.0"
 
 repositories {
   mavenCentral()
@@ -23,7 +23,7 @@ dependencies {
   implementation(kotlin("stdlib-jdk7"))
   implementation(kotlin("stdlib-jdk8"))
 
-  implementation("commons-fileupload:commons-fileupload:1.4")
+  implementation("commons-fileupload:commons-fileupload:1.5")
 
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.8")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.8")
