@@ -252,7 +252,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     try {
       return mapper.convertValue(temp, type)
     } catch (e: IllegalArgumentException) {
-      throw BadRequestException("Input did not resemble the expected form.")
+      throw BadRequestException("Input did not resemble the expected form.", e)
     }
   }
 
