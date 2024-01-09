@@ -1,6 +1,9 @@
 package org.veupathdb.lib.jaxrs.raml.multipart
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.json.JsonMapper
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
 import jakarta.ws.rs.core.MediaType
@@ -269,7 +272,11 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // TODO: Consider using the jackson singleton library instead of having this
     //       separate mapper that requires configuration.
     @JvmStatic
-    var mapper = ObjectMapper()
+    var mapper = JsonMapper.builder()
+      .addModule(ParameterNamesModule())
+      .addModule(Jdk8Module())
+      .addModule(JavaTimeModule())
+      .build()!!
 
     /**
      * Max size for a single non-file field that will be read into memory as

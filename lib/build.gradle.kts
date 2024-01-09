@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.veupathdb.lib"
-version = "1.1.1"
+version = "1.1.2"
 
 repositories {
   mavenCentral()
@@ -30,8 +30,12 @@ dependencies {
   runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.8")
   implementation("org.glassfish.hk2:hk2-api:3.0.3")
 
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.13.4")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.13.4")
+  implementation("com.fasterxml.jackson.core:jackson-core:2.15.3")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
+  implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.3")
+  implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.15.3")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.3")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
