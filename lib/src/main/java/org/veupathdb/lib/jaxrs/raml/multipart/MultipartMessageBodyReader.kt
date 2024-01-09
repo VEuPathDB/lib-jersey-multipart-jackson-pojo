@@ -15,6 +15,9 @@ import org.veupathdb.lib.jaxrs.raml.multipart.utils.*
 import java.io.File
 import java.io.InputStream
 import java.lang.reflect.Type
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.HashMap
 
 private const val DefaultFileName = "upload"
 
@@ -277,6 +280,10 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       .addModule(Jdk8Module())
       .addModule(JavaTimeModule())
       .build()!!
+      .also {
+        it.setDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"))
+        it.dateFormat.timeZone = TimeZone.getDefault()
+      }
 
     /**
      * Max size for a single non-file field that will be read into memory as
