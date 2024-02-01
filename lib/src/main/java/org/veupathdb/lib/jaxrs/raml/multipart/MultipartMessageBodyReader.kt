@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.MultivaluedMap
 import jakarta.ws.rs.ext.MessageBodyReader
 import jakarta.ws.rs.ext.Provider
 import org.apache.commons.fileupload.MultipartStream
+import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.*
 import java.io.File
 import java.io.InputStream
@@ -37,6 +38,7 @@ private const val BufferSize = 8192
  */
 @Provider
 class MultipartMessageBodyReader : MessageBodyReader<Any> {
+  private val log = LoggerFactory.getLogger(javaClass)
 
   /**
    * Tests whether this `MessageBodyReader` should kick in for the given
@@ -68,6 +70,8 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     httpHeaders: MultivaluedMap<String, String>,
     entityStream: InputStream,
   ): Any {
+    log.debug("Running MultipartMessageBodyReader.readFrom on body with type $type")
+
     // Open a stream over the contents of the multipart/form-data body.
     val stream = MultipartStream(entityStream, mediaType.requireBoundaryBytes(), BufferSize, null)
 
@@ -112,7 +116,9 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     // Create the upload file and populate it with the contents of the stream.
     return File(tmpDir, fileName).apply {
       createNewFile()
+      log.debug("Transferring multi-part file data as full input body to $tmpDir/$fileName")
       outputStream().use { stream.readBodyData(CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, it)) }
+      log.debug("Finished transferring multi-part file data to $tmpDir/$fileName")
     }
   }
 
@@ -226,6 +232,8 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       val fieldName = contentDisp.getFormName()
         ?: throw BadRequestException("Bad multipart section, no form field name provided.")
 
+      log.debug("Reading and parsing form field $fieldName.")
+
       // If the target field is of type `File`...
       if (fields[fieldName] == File::class.java) {
         // Figure out what we should name the file.  Prefer the original file
@@ -237,7 +245,9 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
         // field.
         val file = File(tmpDir, fileName).apply {
           createNewFile()
+          log.debug("Transferring multi-part file data to $tmpDir/$fileName")
           CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, outputStream()).use { stream.readBodyData(it) }
+          log.debug("Finished transferring multi-part file data to $tmpDir/$fileName")
         }
 
         // Assign the file value to our temp map.

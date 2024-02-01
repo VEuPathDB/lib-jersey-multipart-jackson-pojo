@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.veupathdb.lib"
-version = "1.1.3"
+version = "1.1.4"
 
 repositories {
   mavenCentral()
@@ -36,6 +36,12 @@ dependencies {
   implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.15.3")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.3")
+
+  api("org.slf4j:slf4j-api:1.7.36")
+  api("org.apache.logging.log4j:log4j-api-kotlin:1.3.0")
+  api("org.apache.logging.log4j:log4j-api:2.21.1")
+  api("org.apache.logging.log4j:log4j-core:2.21.1")
+  api("org.apache.logging.log4j:log4j-slf4j-impl:2.21.1")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
