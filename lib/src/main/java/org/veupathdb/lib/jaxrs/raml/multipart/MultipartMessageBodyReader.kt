@@ -117,7 +117,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     return File(tmpDir, fileName).apply {
       createNewFile()
       log.debug("Transferring multi-part file data as full input body to $tmpDir/$fileName")
-      outputStream().use { stream.readBodyData(CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, it)) }
+      outputStream().buffered().use { stream.readBodyData(CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, it)) }
       log.debug("Finished transferring multi-part file data to $tmpDir/$fileName")
     }
   }
