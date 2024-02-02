@@ -245,9 +245,9 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
         // field.
         val file = File(tmpDir, fileName).apply {
           createNewFile()
-          log.debug("Transferring multi-part file data to $tmpDir/$fileName")
+          log.debug("Transferring multi-part file data to {}/{}", tmpDir, fileName)
           CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, outputStream()).use { stream.readBodyData(it) }
-          log.debug("Finished transferring multi-part file data to $tmpDir/$fileName")
+          log.debug("Finished transferring multi-part file data to {}/{}", tmpDir, fileName)
         }
 
         // Assign the file value to our temp map.
