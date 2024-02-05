@@ -246,7 +246,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
         val file = File(tmpDir, fileName).apply {
           createNewFile()
           log.debug("Transferring multi-part file data to {}/{}", tmpDir, fileName)
-          CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, outputStream()).use { stream.readBodyData(it) }
+          CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, outputStream().buffered()).use { stream.readBodyData(it) }
           log.debug("Finished transferring multi-part file data to {}/{}", tmpDir, fileName)
         }
 
