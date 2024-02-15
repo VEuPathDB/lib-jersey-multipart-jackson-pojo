@@ -21,4 +21,13 @@ class CappedOutputStream(
 
     stream.write(b)
   }
+
+  override fun flush() {
+    stream.flush()
+  }
+
+  override fun close() {
+    stream.flush()
+    stream.close()
+  }
 }
