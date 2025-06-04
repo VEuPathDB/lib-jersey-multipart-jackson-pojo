@@ -23,6 +23,7 @@ public class Controller {
     System.out.println(model.getBar());
     System.out.println(model.getFizz());
     System.out.println(model.getBuzz());
+    System.out.println(model.getFiles());
   }
 
   @POST

@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSetter
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
+import java.lang.reflect.Type
 
-internal fun Class<Any>.fieldsMap(): Map<String, Class<*>> {
-  val out = HashMap<String, Class<*>>(1)
+internal fun Class<Any>.fieldsMap(): Map<String, Type> {
+  val out = HashMap<String, Type>(1)
 
   // Look through all the methods on the class for our targets
   for (method in methods) {
@@ -25,7 +26,7 @@ internal fun Class<Any>.fieldsMap(): Map<String, Class<*>> {
 
     // Get the jackson annotated field name (or ignore the field if it has
     // no such name).
-    out.put(method.getJacksonName() ?: continue, method.parameters[0].type)
+    out.put(method.getJacksonName() ?: continue, method.parameters[0].parameterizedType)
   }
 
   return out

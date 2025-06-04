@@ -1,28 +1,32 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-  kotlin("jvm") version "1.7.20"
+  kotlin("jvm") version "2.1.21"
   `maven-publish`
 }
 
 group = "org.veupathdb.lib"
-version = "1.1.7"
+version = "1.2.0"
 
 repositories {
   mavenCentral()
 }
 
+kotlin {
+  compilerOptions {
+    jvmTarget = JvmTarget.JVM_21
+  }
+}
+
 java {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
 
   withJavadocJar()
   withSourcesJar()
 }
 
 dependencies {
-  implementation(kotlin("stdlib"))
-  implementation(kotlin("stdlib-jdk7"))
-  implementation(kotlin("stdlib-jdk8"))
-
   implementation("commons-fileupload:commons-fileupload:1.5")
 
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.8")
@@ -30,14 +34,14 @@ dependencies {
   runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.8")
   implementation("org.glassfish.hk2:hk2-api:3.0.3")
 
-  implementation("com.fasterxml.jackson.core:jackson-core:2.15.3")
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.3")
-  implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.15.3")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.3")
+  implementation("com.fasterxml.jackson.core:jackson-core:2.19.0")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
+  implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.0")
+  implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.19.0")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.19.0")
 
-  api("org.slf4j:slf4j-api:1.7.36")
+  api("org.slf4j:slf4j-api:2.0.17")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
@@ -53,8 +57,8 @@ publishing {
       name = "GitHub"
       url = uri("https://maven.pkg.github.com/VEuPathDB/lib-jersey-multipart-jackson-pojo")
       credentials {
-        username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-        password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+        username = project.findProperty("github.username") as String? ?: System.getenv("GH_USERNAME")
+        password = project.findProperty("github.token") as String? ?: System.getenv("GH_TOKEN")
       }
     }
   }

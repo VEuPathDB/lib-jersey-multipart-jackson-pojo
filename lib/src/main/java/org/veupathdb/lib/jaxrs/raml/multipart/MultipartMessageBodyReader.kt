@@ -15,9 +15,10 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.*
 import java.io.File
 import java.io.InputStream
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.TimeZone
 import kotlin.collections.HashMap
 
 private const val DefaultFileName = "upload"
@@ -70,7 +71,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     httpHeaders: MultivaluedMap<String, String>,
     entityStream: InputStream,
   ): Any {
-    log.debug("Running MultipartMessageBodyReader.readFrom on body with type $type")
+    log.debug("Running MultipartMessageBodyReader.readFrom on body with type {}", type)
 
     // Open a stream over the contents of the multipart/form-data body.
     val stream = MultipartStream(entityStream, mediaType.requireBoundaryBytes(), BufferSize, null)
@@ -114,12 +115,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
     val fileName = cont.getFileName() ?: cont.getFormName() ?: DefaultFileName
 
     // Create the upload file and populate it with the contents of the stream.
-    return File(tmpDir, fileName).apply {
-      createNewFile()
-      log.debug("Transferring multi-part file data as full input body to $tmpDir/$fileName")
-      outputStream().buffered().use { stream.readBodyData(CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, it)) }
-      log.debug("Finished transferring multi-part file data to $tmpDir/$fileName")
-    }
+    return stream.toFile(fileName, tmpDir)
   }
 
   /**
@@ -156,7 +152,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       // Attempt to read the first part of the body as the generic type defined by
       // the constructor method's input parameter.
       val inp = mapper.convertValue<Any>(
-        stream.readContentAsJsonNode(maxVariableSize),
+        stream.readContentAsJsonNode(JaxRSMultipartUpload.maxInMemoryFieldSize),
         mapper.typeFactory.constructType(constructor.genericParameterTypes[0])
       )
 
@@ -234,28 +230,16 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
 
       log.debug("Reading and parsing form field $fieldName.")
 
-      // If the target field is of type `File`...
-      if (fields[fieldName] == File::class.java) {
-        // Figure out what we should name the file.  Prefer the original file
-        // name if available, otherwise use the form field name.
-        val fileName = contentDisp.getFileName()
-          ?: fieldName
-
-        // Copy the data from the body part into a temp file to back the POJO
-        // field.
-        val file = File(tmpDir, fileName).apply {
-          createNewFile()
-          log.debug("Transferring multi-part file data to {}/{}", tmpDir, fileName)
-          CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, outputStream().buffered()).use { stream.readBodyData(it) }
-          log.debug("Finished transferring multi-part file data to {}/{}", tmpDir, fileName)
-        }
-
-        // Assign the file value to our temp map.
-        temp[fieldName] = file
-
-      } else {
-        // Do regular parse
-        temp[fieldName] = stream.readContentAsJsonNode(maxVariableSize)
+      when {
+        fields[fieldName] == File::class.java -> temp.appendFileField(fieldName, contentDisp, stream, tmpDir)
+        fields[fieldName] is ParameterizedType -> temp.appendParameterizedType(
+          fields[fieldName] as ParameterizedType,
+          fieldName,
+          contentDisp,
+          stream,
+          tmpDir,
+        )
+        else -> temp.appendFieldFallback(fieldName, stream)
       }
 
     } while (stream.readBoundary())
@@ -279,6 +263,52 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
   @Suppress("NOTHING_TO_INLINE")
   private inline fun MediaType.requireBoundaryBytes() = requireBoundary().toByteArray()
 
+  private fun MutableMap<String, Any>.appendFileField(fieldName: String, contentDisp: List<String>, stream: MultipartStream, tmpDir: File) {
+    // Copy the data from the body part into a temp file to back the POJO
+    // field.
+    this[fieldName] = stream.toFile(contentDisp.getFileName() ?: fieldName, tmpDir)
+  }
+
+  private fun MultipartStream.toFile(name: String, tmpDir: File) =
+    File(tmpDir, name).apply {
+      createNewFile()
+      log.debug("Transferring multi-part file data to {}/{}", tmpDir, name)
+      CappedOutputStream(JaxRSMultipartUpload.maxFileUploadSize, outputStream().buffered()).use { readBodyData(it) }
+      log.debug("Finished transferring multi-part file data to {}/{}", tmpDir, name)
+    }
+
+  private fun MutableMap<String, Any>.appendParameterizedType(
+    type: ParameterizedType,
+    fieldName: String,
+    contentDisp: List<String>,
+    stream: MultipartStream,
+    tmpDir: File
+  ) {
+    val (colType, genType) = type.decomposeCollection() ?: return appendFieldFallback(fieldName, stream)
+
+    val file = when (genType) {
+      File::class.java -> stream.toFile(contentDisp.getFileName() ?: fieldName, tmpDir)
+      else -> return appendFieldFallback(fieldName, stream)
+    }
+
+    val col: ColConstructor<File> = when (colType) {
+      List::class.java -> ::ArrayList
+      Set::class.java ->  ::HashSet
+      else -> throw IllegalStateException()
+    }
+
+    if (fieldName in this) {
+      @Suppress("UNCHECKED_CAST")
+      (this[fieldName] as MutableCollection<File>).add(file)
+    } else {
+      this[fieldName] = col(2).apply { add(file) }
+    }
+  }
+
+  private fun MutableMap<String, Any>.appendFieldFallback(fieldName: String, stream: MultipartStream) {
+    this[fieldName] = stream.readContentAsJsonNode(JaxRSMultipartUpload.maxInMemoryFieldSize)
+  }
+
   companion object {
 
     // Jackson
@@ -294,15 +324,5 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
         it.setDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"))
         it.dateFormat.timeZone = TimeZone.getDefault()
       }
-
-    /**
-     * Max size for a single non-file field that will be read into memory as
-     * part of a POJO.
-     *
-     * Defaults to 16MiB.
-     */
-    @JvmStatic
-    @Deprecated("This field is being replaced in favor of JaxRSMultipartUpload.maxInMemoryFieldSize.")
-    var maxVariableSize = JaxRSMultipartUpload.maxInMemoryFieldSize
   }
 }
