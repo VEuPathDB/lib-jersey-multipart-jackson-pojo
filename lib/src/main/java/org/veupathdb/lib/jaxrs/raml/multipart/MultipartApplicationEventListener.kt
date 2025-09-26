@@ -4,6 +4,7 @@ import jakarta.ws.rs.ext.Provider
 import org.glassfish.jersey.server.monitoring.ApplicationEvent
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener
 import org.glassfish.jersey.server.monitoring.RequestEvent
+import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.isMultipart
 
 /**
@@ -18,7 +19,9 @@ import org.veupathdb.lib.jaxrs.raml.multipart.utils.isMultipart
  * @since 1.0.0
  */
 @Provider
-class MultipartApplicationEventListener : ApplicationEventListener {
+class MultipartApplicationEventListener: ApplicationEventListener {
+
+  private val log = LoggerFactory.getLogger(javaClass)
 
   /**
    * Does nothing.
@@ -33,9 +36,12 @@ class MultipartApplicationEventListener : ApplicationEventListener {
    *
    * @return Request event listener or `null`.
    */
-  override fun onRequest(requestEvent: RequestEvent) =
-    if (requestEvent.isMultipart())
-      MultipartRequestEventListener(requestEvent)
-    else
+  override fun onRequest(requestEvent: RequestEvent): MultipartRequestEventListener? {
+    return if (requestEvent.isMultipart()) {
+      log.debug("received multipart request event")
+      MultipartRequestEventListener(requestEvent, log)
+    } else {
       null
+    }
+  }
 }

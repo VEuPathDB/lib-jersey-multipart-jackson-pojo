@@ -2,6 +2,7 @@ package org.veupathdb.lib.jaxrs.raml.multipart
 
 import org.glassfish.jersey.server.monitoring.RequestEvent
 import org.glassfish.jersey.server.monitoring.RequestEventListener
+import org.slf4j.Logger
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.createTempDirectory
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.deleteTempDirectory
 import org.veupathdb.lib.jaxrs.raml.multipart.utils.isMultipart
@@ -20,7 +21,7 @@ import org.veupathdb.lib.jaxrs.raml.multipart.utils.isMultipart
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-class MultipartRequestEventListener(event: RequestEvent) : RequestEventListener {
+class MultipartRequestEventListener(event: RequestEvent, private val log: Logger) : RequestEventListener {
 
   // We do this on init because the `START` request event is never actually
   // passed to the `onEvent` method, the creation of the event listener _is_ the
@@ -47,12 +48,16 @@ class MultipartRequestEventListener(event: RequestEvent) : RequestEventListener 
   }
 
   private fun onRequestStart(event: RequestEvent) {
-    if (event.isMultipart())
+    if (event.isMultipart()) {
+      log.debug("creating temp dir for multipart upload")
       event.containerRequest.headers.add(TempDirHeader, event.containerRequest.createTempDirectory().path)
+    }
   }
 
   private fun onRequestEnd(event: RequestEvent) {
-    if (event.isMultipart())
+    if (event.isMultipart()) {
       event.containerRequest.deleteTempDirectory()
+      log.debug("removed temp dir for multipart upload")
+    }
   }
 }

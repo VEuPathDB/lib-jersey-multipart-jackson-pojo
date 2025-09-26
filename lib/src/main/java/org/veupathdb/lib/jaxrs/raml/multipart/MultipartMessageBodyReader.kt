@@ -19,7 +19,6 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import kotlin.collections.HashMap
 
 private const val DefaultFileName = "upload"
 
@@ -40,6 +39,10 @@ private const val BufferSize = 8192
 @Provider
 class MultipartMessageBodyReader : MessageBodyReader<Any> {
   private val log = LoggerFactory.getLogger(javaClass)
+
+  init {
+    log.debug("multipart body reader enabled")
+  }
 
   /**
    * Tests whether this `MessageBodyReader` should kick in for the given
