@@ -31,7 +31,7 @@ application {
 dependencies {
   implementation(project(":multipart-jackson-pojo"))
 
-  implementation("commons-fileupload:commons-fileupload:1.5")
+  implementation("commons-fileupload:commons-fileupload:1.6.0")
 
   implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.6")

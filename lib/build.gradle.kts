@@ -27,7 +27,7 @@ java {
 }
 
 dependencies {
-  implementation("commons-fileupload:commons-fileupload:1.5")
+  implementation("commons-fileupload:commons-fileupload:1.6.0")
 
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.8")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.8")
