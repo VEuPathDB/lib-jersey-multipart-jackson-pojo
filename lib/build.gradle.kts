@@ -34,12 +34,12 @@ dependencies {
   runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.8")
   implementation("org.glassfish.hk2:hk2-api:3.0.3")
 
-  implementation("com.fasterxml.jackson.core:jackson-core:2.19.0")
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.0")
-  implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.19.0")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.19.0")
+  implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
+  implementation("com.fasterxml.jackson.core:jackson-annotations:2.20.0")
+  implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.20.0")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0")
 
   api("org.slf4j:slf4j-api:2.0.17")
 
