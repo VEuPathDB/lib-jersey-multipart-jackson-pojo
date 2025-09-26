@@ -39,8 +39,8 @@ dependencies {
   runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.6")
   implementation("org.glassfish.hk2:hk2-api:3.0.3")
 
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.0")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
+  implementation("com.fasterxml.jackson.core:jackson-annotations:2.20.0")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
