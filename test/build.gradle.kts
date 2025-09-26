@@ -36,7 +36,7 @@ dependencies {
   implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.6")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.6")
-  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.6")
+  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
   implementation("org.glassfish.hk2:hk2-api:3.1.1")
 
   implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")

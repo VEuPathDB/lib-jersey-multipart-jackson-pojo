@@ -31,7 +31,7 @@ dependencies {
 
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.8")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.0.8")
-  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.0.8")
+  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
   implementation("org.glassfish.hk2:hk2-api:3.1.1")
 
   implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
