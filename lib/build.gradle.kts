@@ -43,8 +43,8 @@ dependencies {
 
   api("org.slf4j:slf4j-api:2.0.17")
 
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.0")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.0")
 }
 
 tasks.getByName<Test>("test") {
