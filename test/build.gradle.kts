@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-  kotlin("jvm") version "2.2.21"
+  alias(libs.plugins.kotlin)
   id("application")
   id("java")
 }
@@ -11,6 +11,14 @@ version = "1.1.1"
 
 repositories {
   mavenCentral()
+  maven {
+    name = "GitHubPackages"
+    url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
+    credentials {
+      username = if (extra.has("gpr.user")) extra["gpr.user"] as String? else System.getenv("GITHUB_USERNAME")
+      password = if (extra.has("gpr.key")) extra["gpr.key"] as String? else System.getenv("GITHUB_TOKEN")
+    }
+  }
 }
 
 kotlin {
@@ -31,19 +39,15 @@ application {
 dependencies {
   implementation(project(":multipart-jackson-pojo"))
 
-  implementation("commons-fileupload:commons-fileupload:1.6.0")
-
   implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2")
-  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.11")
-  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.1.11")
-  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
-  implementation("org.glassfish.hk2:hk2-api:3.1.1")
 
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.20.0")
+  implementation(libs.commons.uploads)
+  implementation(libs.jackson)
+  implementation(libs.bundles.jersey)
 
-  testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.1")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.1")
+  testImplementation(platform(libs.test.junit.bom))
+  testImplementation(libs.test.junit.api)
+  testRuntimeOnly(libs.test.junit.engine)
 }
 
 tasks.getByName<Test>("test") {

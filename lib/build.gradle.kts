@@ -1,15 +1,23 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-  kotlin("jvm") version "2.2.21"
+  alias(libs.plugins.kotlin)
   `maven-publish`
 }
 
 group = "org.veupathdb.lib"
-version = "1.3.1"
+version = "1.3.2"
 
 repositories {
   mavenCentral()
+  maven {
+    name = "GitHubPackages"
+    url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
+    credentials {
+      username = if (extra.has("gpr.user")) extra["gpr.user"] as String? else System.getenv("GITHUB_USERNAME")
+      password = if (extra.has("gpr.key")) extra["gpr.key"] as String? else System.getenv("GITHUB_TOKEN")
+    }
+  }
 }
 
 kotlin {
@@ -27,24 +35,15 @@ java {
 }
 
 dependencies {
-  implementation("commons-fileupload:commons-fileupload:1.6.0")
+  api(libs.logging)
 
-  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.11")
-  implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:3.1.11")
-  runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
-  implementation("org.glassfish.hk2:hk2-api:3.1.1")
+  implementation(libs.commons.uploads)
+  implementation(libs.jackson)
+  implementation(libs.bundles.jersey)
 
-  implementation("com.fasterxml.jackson.core:jackson-core:2.19.2")
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.2")
-  implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.19.2")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.19.2")
-
-  api("org.slf4j:slf4j-api:2.0.17")
-
-  testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.1")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.1")
+  testImplementation(platform(libs.test.junit.bom))
+  testImplementation(libs.test.junit.api)
+  testRuntimeOnly(libs.test.junit.engine)
 }
 
 tasks.getByName<Test>("test") {
