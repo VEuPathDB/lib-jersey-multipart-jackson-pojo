@@ -1,5 +1,4 @@
 @file:Suppress("NOTHING_TO_INLINE")
-
 package org.veupathdb.lib.jaxrs.raml.multipart.utils
 
 import jakarta.ws.rs.core.MediaType

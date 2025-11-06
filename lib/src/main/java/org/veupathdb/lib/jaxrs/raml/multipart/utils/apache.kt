@@ -1,3 +1,4 @@
+@file:Suppress("NOTHING_TO_INLINE")
 package org.veupathdb.lib.jaxrs.raml.multipart.utils
 
 import com.fasterxml.jackson.core.JsonParseException
@@ -53,7 +54,7 @@ internal fun MultipartStream.readContentAsJsonNode(maxSize: Long) =
   contentToString(maxSize).let {
     try {
       MultipartMessageBodyReader.mapper.readTree(it)
-    } catch (e: JsonParseException) {
+    } catch (_: JsonParseException) {
       MultipartMessageBodyReader.mapper.readTree("\"$it\"")
     }
   }
@@ -64,7 +65,6 @@ internal fun MultipartStream.readContentAsJsonNode(maxSize: Long) =
  * @return The form name value as parsed from the headers or `null` if no form
  * name value was provided.
  */
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun List<String>.getFormName() =
   find { it.startsWith(FormNamePrefix) }
     ?.substring(FormNamePrefix.length)
@@ -76,7 +76,6 @@ internal inline fun List<String>.getFormName() =
  * @return The file name value as parsed from the headers or `null` if no file
  * name value was provided.
  */
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun List<String>.getFileName() =
   find { it.startsWith(FileNamePrefix) }
     ?.substring(FileNamePrefix.length)
@@ -89,7 +88,6 @@ internal inline fun List<String>.getFileName() =
  * @return The receiver string which may have had a single double quote
  * character removed from both the start and end of the string.
  */
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun String.removeQuotes() =
   if (get(0) == '"' && get(lastIndex) == '"')
     substring(1, lastIndex)
@@ -103,7 +101,6 @@ internal inline fun String.removeQuotes() =
  * @return The values of the `Content-Disposition` header, if it was set,
  * otherwise `null`.
  */
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun Map<String, List<String>>.getContentDisposition() =
   get(keys.find { it.lowercase() == LCContentDisp })
 

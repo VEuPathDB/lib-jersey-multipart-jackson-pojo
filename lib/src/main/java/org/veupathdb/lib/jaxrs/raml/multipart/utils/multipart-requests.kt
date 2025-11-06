@@ -1,5 +1,4 @@
 @file:JvmName("MultipartRequests")
-
 package org.veupathdb.lib.jaxrs.raml.multipart.utils
 
 import jakarta.ws.rs.InternalServerErrorException

@@ -324,7 +324,7 @@ class MultipartMessageBodyReader : MessageBodyReader<Any> {
       .addModule(JavaTimeModule())
       .build()!!
       .also {
-        it.setDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"))
+        it.dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
         it.dateFormat.timeZone = TimeZone.getDefault()
       }
   }

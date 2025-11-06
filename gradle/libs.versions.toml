@@ -1,0 +1,24 @@
+[versions]
+jersey = "3.1.11"
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version = "2.2.21" }
+
+[libraries]
+logging = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
+
+jackson = { module = "org.veupathdb.lib:jackson-singleton-json", version = "4.0.5" }
+
+commons-uploads = { module = "commons-fileupload:commons-fileupload", version = "1.6.0" }
+
+jersey-hk2-api = { module = "org.glassfish.hk2:hk2-api", version = "3.1.1" }
+jersey-http = { module = "org.glassfish.jersey.containers:jersey-container-grizzly2-http", version.ref = "jersey" }
+jersey-servlet = { module = "org.glassfish.jersey.containers:jersey-container-grizzly2-servlet", version.ref = "jersey" }
+jersey-hk2-inject =  { module = "org.glassfish.jersey.inject:jersey-hk2", version.ref = "jersey" }
+
+test-junit-bom = { module = "org.junit:junit-bom", version = "6.0.1" }
+test-junit-api = { module = "org.junit.jupiter:junit-jupiter" }
+test-junit-engine = { module = "org.junit.platform:junit-platform-launcher" }
+
+[bundles]
+jersey = [ "jersey-hk2-api", "jersey-hk2-inject", "jersey-http", "jersey-servlet" ]

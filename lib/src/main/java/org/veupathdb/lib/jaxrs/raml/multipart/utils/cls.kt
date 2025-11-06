@@ -26,7 +26,7 @@ internal fun Class<Any>.fieldsMap(): Map<String, Type> {
 
     // Get the jackson annotated field name (or ignore the field if it has
     // no such name).
-    out.put(method.getJacksonName() ?: continue, method.parameters[0].parameterizedType)
+    out[method.getJacksonName() ?: continue] = method.parameters[0].parameterizedType
   }
 
   return out
