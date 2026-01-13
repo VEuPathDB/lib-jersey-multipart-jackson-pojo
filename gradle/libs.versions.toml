@@ -16,7 +16,7 @@ jersey-http = { module = "org.glassfish.jersey.containers:jersey-container-grizz
 jersey-servlet = { module = "org.glassfish.jersey.containers:jersey-container-grizzly2-servlet", version.ref = "jersey" }
 jersey-hk2-inject =  { module = "org.glassfish.jersey.inject:jersey-hk2", version.ref = "jersey" }
 
-test-junit-bom = { module = "org.junit:junit-bom", version = "6.0.1" }
+test-junit-bom = { module = "org.junit:junit-bom", version = "6.0.2" }
 test-junit-api = { module = "org.junit.jupiter:junit-jupiter" }
 test-junit-engine = { module = "org.junit.platform:junit-platform-launcher" }
 
