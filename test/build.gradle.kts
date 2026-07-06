@@ -39,7 +39,7 @@ application {
 dependencies {
   implementation(project(":multipart-jackson-pojo"))
 
-  implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.26.0")
+  implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.26.1")
 
   implementation(libs.commons.uploads)
   implementation(libs.jackson)
