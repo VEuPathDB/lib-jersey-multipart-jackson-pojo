@@ -7,7 +7,7 @@ kotlin = { id = "org.jetbrains.kotlin.jvm", version = "2.4.20" }
 [libraries]
 logging = { module = "org.slf4j:slf4j-api", version = "2.0.20" }
 
-jackson = { module = "org.veupathdb.lib:jackson-singleton-json", version = "4.1.0" }
+jackson = { module = "org.veupathdb.lib:jackson-singleton-json", version = "4.2.0" }
 
 commons-uploads = { module = "commons-fileupload:commons-fileupload", version = "1.6.0" }
 
