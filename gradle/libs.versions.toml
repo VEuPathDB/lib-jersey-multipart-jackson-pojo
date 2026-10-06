@@ -1,5 +1,5 @@
 [versions]
-jersey = "4.0.2"
+jersey = "4.0.3"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version = "2.4.20" }
